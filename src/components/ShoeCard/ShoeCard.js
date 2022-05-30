@@ -34,12 +34,12 @@ const ShoeCard = ({
   return (
     <Link href={`/shoe/${slug}`}>
       <Wrapper>
-        <ImageWrapper>
-          <Image alt="" src={imageSrc} />
           {variant === 'on-sale' && <SaleFlag>Sale</SaleFlag>}
           {variant === 'new-release' && (
             <NewFlag>Just released!</NewFlag>
           )}
+        <ImageWrapper>
+          <Image alt="" src={imageSrc} />
         </ImageWrapper>
         <Spacer size={12} />
         <Row>
@@ -73,16 +73,44 @@ const Link = styled.a`
   color: inherit;
 `;
 
-const Wrapper = styled.article``;
-
-const ImageWrapper = styled.div`
+const Wrapper = styled.article`
   position: relative;
+  
 `;
 
 const Image = styled.img`
   width: 100%;
-  border-radius: 16px 16px 4px 4px;
+  transition: transform 500ms;
+  transform-origin: 50% 80%;
+  will-change: transform;
 `;
+
+const ImageWrapper = styled.div`
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px 16px 4px 4px;
+  line-height: 0;
+  transition: filter 1000ms;
+  
+  &:hover {
+    /* It bugs me a little bit that the drop-shadow looks different on the 
+    bottom due to the less-rounded corners, but not sure what to do about it 
+    (other than make the border-radius the same on the top and bottom.) */
+    filter: drop-shadow(0 0 0.25rem gray);
+    transition: filter 150ms;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    &:hover ${Image} {
+      /* I wish I could get this transition to also happen when Flags are 
+      hovered, but I couldn't get it working without messing up the way Flags are 
+      displayed generally. */
+      transform: scale(1.1);
+      transition: transform 150ms;
+    }
+  }
+`;
+
 
 const Row = styled.div`
   font-size: 1rem;
@@ -121,6 +149,9 @@ const Flag = styled.div`
   font-weight: ${WEIGHTS.bold};
   color: var(--color-white);
   border-radius: 2px;
+
+  ${'' /* TODO: Kinda hacky, would rather not rely on z-index. Revisit later. */}
+  z-index: 10;
 `;
 
 const SaleFlag = styled(Flag)`
